@@ -5,6 +5,7 @@ import com.claims.DTOs.Request.RegisterRequestDTO;
 import com.claims.DTOs.Response.LoginResponseDTO;
 import com.claims.DTOs.Response.RegisterResponseDTO;
 import com.claims.repository.interfaces.UserRepository;
+import com.claims.security.jwt.JwtService;
 import com.claims.service.AuthService;
 import com.claims.user.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,10 +18,16 @@ public class AuthServiceImpl implements AuthService {
 
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
+    private JwtService jwtService;
 
-    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthServiceImpl(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService
+    ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public boolean checkUserAlreadyExist(RegisterRequestDTO registerRequestDTO){
@@ -33,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
         if(!checkUserAlreadyExist(registerRequestDTO)){
 
             String password = passwordEncoder.encode(registerRequestDTO.getPassword());
-
+            String token = jwtService.generateToken(registerRequestDTO.getEmail());
             User user = new User();
 
             user.setName(registerRequestDTO.getName());
@@ -41,10 +48,10 @@ public class AuthServiceImpl implements AuthService {
             user.setPassword(password);
 
             userRepository.save(user);
-            return new RegisterResponseDTO("Registration Successful");
+            return new RegisterResponseDTO("Registration Successful",token);
         }
         else{
-            return new RegisterResponseDTO("Registration Already Exists");
+            return new RegisterResponseDTO("Email already exists");
         }
     }
 
@@ -61,10 +68,11 @@ public class AuthServiceImpl implements AuthService {
             );
 
             if(isPasswordMatch){
-                return new LoginResponseDTO("Login Successful");
+                String token = jwtService.generateToken(loginRequestDTO.getEmail());
+                return new LoginResponseDTO("Login Successful", token);
             }
             else {
-                return new LoginResponseDTO("Invalid Password");
+                return new LoginResponseDTO("Invalid email or password");
             }
     }
 }
