@@ -9,4 +9,10 @@ public class RegisterResponseDTO {
 
     private String message;
 
+    private String token;
+
+    public RegisterResponseDTO(String message) {
+        this.message = message;
+    }
+
 }
