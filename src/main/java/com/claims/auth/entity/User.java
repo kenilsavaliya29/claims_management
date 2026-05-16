@@ -1,18 +1,16 @@
-package com.claims.user;
+package com.claims.auth.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
-@Entity()
+@Entity
 @Data
+@Table(name = "users")
 public class User {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     private String name;

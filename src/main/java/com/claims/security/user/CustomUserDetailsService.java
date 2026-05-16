@@ -1,7 +1,7 @@
 package com.claims.security.user;
 
-import com.claims.repository.interfaces.UserRepository;
-import com.claims.user.User;
+import com.claims.auth.repository.UserRepository;
+import com.claims.auth.entity.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
