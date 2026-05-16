@@ -1,4 +1,4 @@
-package com.claims.DTOs.Response;
+package com.claims.auth.dto.Response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

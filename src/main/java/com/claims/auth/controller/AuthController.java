@@ -1,10 +1,10 @@
-package com.claims.controller;
+package com.claims.auth.controller;
 
-import com.claims.DTOs.Request.LoginRequestDTO;
-import com.claims.DTOs.Request.RegisterRequestDTO;
-import com.claims.DTOs.Response.LoginResponseDTO;
-import com.claims.DTOs.Response.RegisterResponseDTO;
-import com.claims.service.AuthService;
+import com.claims.auth.dto.Request.LoginRequestDTO;
+import com.claims.auth.dto.Request.RegisterRequestDTO;
+import com.claims.auth.dto.Response.LoginResponseDTO;
+import com.claims.auth.dto.Response.RegisterResponseDTO;
+import com.claims.auth.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 

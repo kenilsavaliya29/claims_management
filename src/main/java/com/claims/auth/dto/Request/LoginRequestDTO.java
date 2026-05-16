@@ -1,14 +1,11 @@
-package com.claims.DTOs.Request;
+package com.claims.auth.dto.Request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data
-public class RegisterRequestDTO {
-
-
-    private String name;
+public class LoginRequestDTO {
 
     @NotEmpty
     @Email
@@ -17,3 +14,4 @@ public class RegisterRequestDTO {
     @NotEmpty
     private String password;
 }
+

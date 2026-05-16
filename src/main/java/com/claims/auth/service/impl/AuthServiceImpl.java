@@ -1,13 +1,14 @@
-package com.claims.service.impl;
+package com.claims.auth.service.impl;
 
-import com.claims.DTOs.Request.LoginRequestDTO;
-import com.claims.DTOs.Request.RegisterRequestDTO;
-import com.claims.DTOs.Response.LoginResponseDTO;
-import com.claims.DTOs.Response.RegisterResponseDTO;
-import com.claims.repository.interfaces.UserRepository;
+import com.claims.auth.Role;
+import com.claims.auth.dto.Request.LoginRequestDTO;
+import com.claims.auth.dto.Request.RegisterRequestDTO;
+import com.claims.auth.dto.Response.LoginResponseDTO;
+import com.claims.auth.dto.Response.RegisterResponseDTO;
+import com.claims.auth.repository.UserRepository;
 import com.claims.security.jwt.JwtService;
-import com.claims.service.AuthService;
-import com.claims.user.User;
+import com.claims.auth.service.AuthService;
+import com.claims.auth.entity.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +47,7 @@ public class AuthServiceImpl implements AuthService {
             user.setName(registerRequestDTO.getName());
             user.setEmail(registerRequestDTO.getEmail());
             user.setPassword(password);
+            user.setRole(Role.USER);
 
             userRepository.save(user);
             return new RegisterResponseDTO("Registration Successful",token);
