@@ -1,5 +1,6 @@
 package com.claims.auth.entity;
 
+import com.claims.auth.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
@@ -19,5 +20,8 @@ public class User {
     @Column(unique = true)
     private String email;
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
 }

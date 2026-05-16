@@ -1,4 +1,4 @@
-package com.claims.auth;
+package com.claims.auth.controller;
 
 import com.claims.auth.dto.Request.LoginRequestDTO;
 import com.claims.auth.dto.Request.RegisterRequestDTO;

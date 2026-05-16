@@ -1,4 +1,4 @@
-package com.claims.claim.dto;
+package com.claims.claim.dto.response;
 
 import com.claims.claim.ClaimStatus;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ClaimResponseDTO {
+public class ClaimCreateResponseDTO {
 
     private String message;
     private String claimId;

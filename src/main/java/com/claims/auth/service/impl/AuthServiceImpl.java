@@ -1,5 +1,6 @@
 package com.claims.auth.service.impl;
 
+import com.claims.auth.Role;
 import com.claims.auth.dto.Request.LoginRequestDTO;
 import com.claims.auth.dto.Request.RegisterRequestDTO;
 import com.claims.auth.dto.Response.LoginResponseDTO;
@@ -46,6 +47,7 @@ public class AuthServiceImpl implements AuthService {
             user.setName(registerRequestDTO.getName());
             user.setEmail(registerRequestDTO.getEmail());
             user.setPassword(password);
+            user.setRole(Role.USER);
 
             userRepository.save(user);
             return new RegisterResponseDTO("Registration Successful",token);

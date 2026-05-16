@@ -1,11 +1,11 @@
-package com.claims.claim.dto;
+package com.claims.claim.dto.request;
 
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Data
-public class ClaimRequestDTO {
+public class ClaimCreateRequestDTO {
 
     private String claimType;
     private String title;
