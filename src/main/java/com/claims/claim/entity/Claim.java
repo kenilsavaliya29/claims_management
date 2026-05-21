@@ -32,6 +32,8 @@ public class Claim {
 
     private LocalDate incidentDate;
     private BigDecimal amount;
+
+    @Enumerated(EnumType.STRING)
     private ClaimStatus status;
 
     private String createdBy;
