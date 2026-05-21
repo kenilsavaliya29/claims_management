@@ -51,34 +51,52 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         jwtToken = authHeader.substring(7);
 
-        userEmail = jwtService.extractEmail(jwtToken);
+        try {
 
-        if(userEmail != null &&
-                SecurityContextHolder.getContext()
-                        .getAuthentication() == null) {
+            userEmail = jwtService.extractEmail(jwtToken);
 
-            UserDetails userDetails =
-                    customUserDetailsService
-                            .loadUserByUsername(userEmail);
+            if(userEmail != null &&
+                    SecurityContextHolder.getContext()
+                            .getAuthentication() == null) {
 
-            if(jwtService.validateToken(jwtToken)) {
+                UserDetails userDetails =
+                        customUserDetailsService
+                                .loadUserByUsername(userEmail);
 
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
-                        );
+                if(jwtService.validateToken(jwtToken)) {
 
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource()
-                                .buildDetails(request)
-                );
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
 
-                SecurityContextHolder
-                        .getContext()
-                        .setAuthentication(authToken);
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource()
+                                    .buildDetails(request)
+                    );
+
+                    SecurityContextHolder
+                            .getContext()
+                            .setAuthentication(authToken);
+                }
             }
+
+        } catch (Exception e) {
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+
+            response.getWriter().write("""
+            {
+              "success": false,
+              "status": 401,
+              "message": "Invalid or expired token"
+            }
+        """);
+
+            return;
         }
 
         filterChain.doFilter(request, response);
