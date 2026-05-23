@@ -7,6 +7,9 @@ import com.claims.claim.repository.ClaimRepository;
 import com.claims.claim.service.ClaimService;
 import com.claims.common.dto.ApiResponse;
 import com.claims.common.exception.ClaimNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -74,24 +77,24 @@ public class ClaimServiceImpl implements ClaimService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse> fetchClaims() {
+    public ResponseEntity<ApiResponse> fetchClaims(int page, int size) {
 
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
 
-
         String currentUser = authentication.getName();
 
-        boolean isAdmin =  authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        Pageable pageable = PageRequest.of(page, size);
 
-        List<Claim> claims;
+        Page<Claim> claims = claimRepository.findByCreatedBy(currentUser, pageable);
 
-        if(isAdmin) {
-            claims = claimRepository.findAll();
-        }
-        else{
-            claims =  claimRepository.findByCreatedBy(currentUser);
-        }
+        HashMap<String, Object> responseData = new HashMap<>();
+
+        responseData.put("claims", claims.getContent());
+        responseData.put("currentPage", claims.getNumber());
+        responseData.put("totalItems", claims.getTotalElements());
+        responseData.put("totalPages", claims.getTotalPages());
+        responseData.put("last", claims.isLast());
 
         ApiResponse response =
                 ApiResponse
@@ -99,7 +102,7 @@ public class ClaimServiceImpl implements ClaimService {
                         .success(true)
                         .status(200)
                         .message("Claims fetched successfully")
-                        .data(claims)
+                        .data(responseData)
                         .build();
 
         return ResponseEntity.ok(response);

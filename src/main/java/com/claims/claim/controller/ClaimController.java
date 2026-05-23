@@ -30,8 +30,10 @@ public class ClaimController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<ApiResponse> fetchLoggedUserClaims(){
-        return claimService.fetchClaims();
+    public ResponseEntity<ApiResponse> fetchLoggedUserClaims(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return claimService.fetchClaims(page, size);
     }
 
     @GetMapping("/{claimId}")
