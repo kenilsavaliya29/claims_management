@@ -139,6 +139,7 @@ public class AdminServiceImpl implements AdminService {
         }
 
         claim.setStatus(statusUpdateRequestDTO.getStatus());
+        claim.setAdminRemarks(statusUpdateRequestDTO.getRemarks());
         claim.setUpdatedAt(LocalDateTime.now());
 
         claimRepository.save(claim);

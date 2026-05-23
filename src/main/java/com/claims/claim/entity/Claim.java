@@ -40,4 +40,6 @@ public class Claim {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    private String adminRemarks;
 }
