@@ -71,7 +71,7 @@ public class AuthServiceImpl implements AuthService {
 
             if(isPasswordMatch){
                 String token = jwtService.generateToken(loginRequestDTO.getEmail());
-                return new LoginResponseDTO("Login Successful", token);
+                return new LoginResponseDTO("Login Successful", token, user.getRole().name());
             }
             else {
                 return new LoginResponseDTO("Invalid email or password");

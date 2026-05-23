@@ -1,11 +1,15 @@
 package com.claims.admin.controller;
 
+import com.claims.admin.dto.ClaimFilterRequestDTO;
 import com.claims.admin.dto.StatusUpdateRequestDTO;
 import com.claims.admin.service.AdminService;
+import com.claims.claim.ClaimStatus;
 import com.claims.common.dto.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/admin")
@@ -16,9 +20,9 @@ public class AdminController {
         this.adminService = adminService;
     }
 
-    @PostMapping("/claims")
-    public ResponseEntity<ApiResponse> fetchAllClaims() {
-        return adminService.fetchAllClaims();
+    @GetMapping("/claims")
+    public ResponseEntity<ApiResponse> fetchAllClaims(ClaimFilterRequestDTO filter) {
+        return adminService.fetchAllClaims(filter);
     }
 
     @PostMapping("/claim/{claimId}/status")
