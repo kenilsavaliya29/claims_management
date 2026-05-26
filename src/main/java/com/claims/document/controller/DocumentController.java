@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api")
-public class DocumentUploadController {
+public class DocumentController {
 
     // fetch All document as per user logged in
     @GetMapping("/claims/{claimId}/documents")
