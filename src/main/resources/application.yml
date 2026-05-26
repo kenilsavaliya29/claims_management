@@ -1,8 +1,16 @@
 spring:
+  application:
+    name: Claim Management
+
   datasource:
     url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DB}?ssl-mode=REQUIRED
     username: ${MYSQL_USER}
     password: ${MYSQL_PASS}
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
   jpa:
     hibernate:
