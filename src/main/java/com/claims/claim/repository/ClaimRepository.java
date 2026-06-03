@@ -13,5 +13,6 @@ import java.util.Optional;
 @Repository
 public interface ClaimRepository extends JpaRepository<Claim, Long>, JpaSpecificationExecutor<Claim> {
     public Page<Claim> findByCreatedBy(String createdBy, Pageable pageable);
+    public Claim findByClaimIdAndCreatedBy(String claimId, String createdBy);
     public Optional<Claim> findByClaimId(String claimId);
 }

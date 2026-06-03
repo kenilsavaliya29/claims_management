@@ -1,6 +1,9 @@
 package com.claims.document.controller;
 
 import com.claims.common.dto.ApiResponse;
+import com.claims.document.DocumentType;
+import com.claims.document.service.DocumentService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -9,24 +12,25 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api")
 public class DocumentController {
 
-    // fetch All document as per user logged in
-    @GetMapping("/claims/{claimId}/documents")
-    public ResponseEntity<ApiResponse> fetchAllDocuments(@PathVariable String claimId) {
-        return ResponseEntity.ok(ApiResponse.builder()
-                .success(true).data(null).build());
-    }
+    @Autowired
+    private DocumentService documentService;
 
-    // Download / View document
-    @GetMapping("/documents/{documentId}")
+//    @GetMapping("/claims/{claimId}/documents")
+//    public ResponseEntity<ApiResponse> fetchAllDocuments(@PathVariable String claimId) {
+//        return documentService.fetchAllDocuments(claimId);
+//    }
+//
+//    @GetMapping("/documents/{documentId}")
+//    public ResponseEntity<ApiResponse> fetchDocument(@PathVariable String documentId) {
+//        return documentService.fetchDocument(documentId);
+//    }
 
-    // upload document
     @PostMapping("/claims/{claimId}/documents")
     public ResponseEntity<ApiResponse> uploadDocument(
             @PathVariable String claimId,
             @RequestParam("file") MultipartFile file,
-            @RequestParam("documentType") String documentType
+            @RequestParam("documentType") DocumentType documentType
     ) {
-        return ResponseEntity.ok(ApiResponse.builder()
-                .success(true).data(null).build());
+        return documentService.uploadDoc(claimId, file, documentType);
     }
 }

@@ -1,4 +1,4 @@
-package com.claims.document.dto.request;
+package com.claims.document.dto.response;
 
 public class DocumentUploadResponseDTO {
 }
