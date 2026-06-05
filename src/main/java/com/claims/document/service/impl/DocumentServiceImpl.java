@@ -9,18 +9,22 @@ import com.claims.document.dto.response.DocumentResponseDTO;
 import com.claims.document.entity.DocumentEntity;
 import com.claims.document.repository.DocumentRepository;
 import com.claims.document.service.DocumentService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.Resource;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class DocumentServiceImpl implements DocumentService {
@@ -28,11 +32,106 @@ public class DocumentServiceImpl implements DocumentService {
     private final ClaimRepository claimRepository;
     private final DocumentRepository documentRepository;
 
+    protected final String basePath = "storage/claims/";
+
     public DocumentServiceImpl(ClaimRepository claimRepository, DocumentRepository documentRepository) {
         this.claimRepository = claimRepository;
         this.documentRepository = documentRepository;
     }
 
+    @Override
+    public ResponseEntity<ApiResponse> fetchAllDocumentsMetaData(String claimId) {
+
+        String currentUser = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        List<DocumentEntity> documentDetails = documentRepository.findByClaimIdAndUploadedBy(claimId, currentUser);
+
+        if(documentDetails.isEmpty()) {
+            ApiResponse errorResponse = ApiResponse.builder()
+                    .success(false)
+                    .status(HttpStatus.NOT_FOUND.value())
+                    .message("No documents found")
+                    .build();
+            return ResponseEntity.ok(errorResponse);
+        }
+
+        List<DocumentResponseDTO> response = new ArrayList<>();
+
+        for(DocumentEntity documentEntity : documentDetails) {
+            DocumentResponseDTO documentResponseDTO = DocumentResponseDTO
+                    .builder()
+                    .documentId(documentEntity.getDocumentId())
+                    .documentType(documentEntity.getDocumentType())
+                    .originalFileName(documentEntity.getOriginalFileName())
+                    .contentType(documentEntity.getContentType())
+                    .fileSize(documentEntity.getFileSize())
+                    .uploadedAt(documentEntity.getUploadedAt())
+                    .build();
+
+            response.add(documentResponseDTO);
+        }
+
+
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .success(true)
+                .status(200)
+                .message("Claim Document Metadata Fetched Successfully")
+                .data(response)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @Override
+    public ResponseEntity<Resource> downloadDocument(String documentId) {
+
+        String currentUser = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        DocumentEntity documentDetails = documentRepository.findByDocumentId(documentId).orElseThrow(() -> new DocumentException("Document not found"));
+
+        if (!documentDetails.getUploadedBy().equals(currentUser)) {
+            throw new DocumentException("Unauthorized access to document");
+        }
+
+        try {
+
+            Path filePath = Paths
+                    .get(documentDetails.getFilePath())
+                    .toAbsolutePath();
+
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (!resource.exists()) {
+                throw new DocumentException("Physical file not found");
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(
+                            MediaType.parseMediaType(
+                                    documentDetails.getContentType()
+                            )
+                    )
+                    .header(
+                            HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"" +
+                                    documentDetails.getOriginalFileName() +
+                                    "\""
+                    )
+                    .body(resource);
+
+        } catch (MalformedURLException e) {
+            throw new DocumentException(
+                    "Unable to load document"
+            );
+        }
+    }
 
     @Override
     public ResponseEntity<ApiResponse> uploadDoc(String claimId, MultipartFile file, DocumentType documentType) {
@@ -62,13 +161,14 @@ public class DocumentServiceImpl implements DocumentService {
         if(file.isEmpty()) {
             throw new DocumentException("File is empty");
         }
+
         int lastDot = originalFileName.lastIndexOf('.');
 
         String extension = originalFileName.substring(lastDot + 1);
 
         String storedFileName = UUID.randomUUID() + "." + extension;
 
-        String uploadDirectory = "storage/claims/" + claimId;
+        String uploadDirectory = basePath + claimId;
 
         // file type check
         if(!Objects.equals(fileType, "application/pdf")
@@ -76,7 +176,6 @@ public class DocumentServiceImpl implements DocumentService {
                 && !Objects.equals(fileType, "image/jpeg")) {
             throw new IllegalArgumentException("Invalid file type");
         }
-
 
         try {
             Path uploadPath = Path.of(uploadDirectory).toAbsolutePath();
@@ -86,8 +185,6 @@ public class DocumentServiceImpl implements DocumentService {
             }
 
             Path targetLocation = uploadPath.resolve(storedFileName);
-
-            System.out.println(targetLocation);
 
             Files.copy(
                     file.getInputStream(),
