@@ -7,12 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface ClaimRepository extends JpaRepository<Claim, Long>, JpaSpecificationExecutor<Claim> {
-    public Page<Claim> findByCreatedBy(String createdBy, Pageable pageable);
-    public Claim findByClaimIdAndCreatedBy(String claimId, String createdBy);
-    public Optional<Claim> findByClaimId(String claimId);
+    Page<Claim> findByCreatedBy(String createdBy, Pageable pageable);
+    Claim findByClaimIdAndCreatedBy(String claimId, String createdBy);
+    Optional<Claim> findByClaimId(String claimId);
 }
