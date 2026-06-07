@@ -223,6 +223,7 @@ public class DocumentServiceImpl implements DocumentService {
         if(document != null) {
             s3key = document.getFilePath();
             response = s3Service.deleteFile(s3key);
+            documentRepository.delete(document);
         }
 
         ApiResponse apiResponse = ApiResponse.builder()
