@@ -14,4 +14,6 @@ public interface DocumentService {
 
     ResponseEntity<Resource> downloadDocument(String documentId);
 
+    ResponseEntity<ApiResponse> deleteDoc(String documentId);
+
 }

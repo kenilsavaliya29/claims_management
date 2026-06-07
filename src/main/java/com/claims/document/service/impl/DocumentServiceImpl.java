@@ -9,6 +9,8 @@ import com.claims.document.dto.response.DocumentResponseDTO;
 import com.claims.document.entity.DocumentEntity;
 import com.claims.document.repository.DocumentRepository;
 import com.claims.document.service.DocumentService;
+import com.claims.s3.service.S3Service;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,12 +33,14 @@ public class DocumentServiceImpl implements DocumentService {
 
     private final ClaimRepository claimRepository;
     private final DocumentRepository documentRepository;
+    private final S3Service s3Service;
 
-    protected final String basePath = "storage/claims/";
+    protected final String basePath = "claims/";
 
-    public DocumentServiceImpl(ClaimRepository claimRepository, DocumentRepository documentRepository) {
+    public DocumentServiceImpl(ClaimRepository claimRepository, DocumentRepository documentRepository, S3Service s3Service) {
         this.claimRepository = claimRepository;
         this.documentRepository = documentRepository;
+        this.s3Service = s3Service;
     }
 
     @Override
@@ -100,37 +104,24 @@ public class DocumentServiceImpl implements DocumentService {
             throw new DocumentException("Unauthorized access to document");
         }
 
-        try {
+        byte[] file = s3Service.downloadFile(documentDetails.getFilePath());
 
-            Path filePath = Paths
-                    .get(documentDetails.getFilePath())
-                    .toAbsolutePath();
+        ByteArrayResource resource = new ByteArrayResource(file);
 
-            Resource resource = new UrlResource(filePath.toUri());
+        return ResponseEntity.ok()
+                .contentType(
+                        MediaType.parseMediaType(
+                                documentDetails.getContentType()
+                        )
+                )
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" +
+                                documentDetails.getOriginalFileName() +
+                                "\""
+                )
+                .body(resource);
 
-            if (!resource.exists()) {
-                throw new DocumentException("Physical file not found");
-            }
-
-            return ResponseEntity.ok()
-                    .contentType(
-                            MediaType.parseMediaType(
-                                    documentDetails.getContentType()
-                            )
-                    )
-                    .header(
-                            HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=\"" +
-                                    documentDetails.getOriginalFileName() +
-                                    "\""
-                    )
-                    .body(resource);
-
-        } catch (MalformedURLException e) {
-            throw new DocumentException(
-                    "Unable to load document"
-            );
-        }
     }
 
     @Override
@@ -165,10 +156,9 @@ public class DocumentServiceImpl implements DocumentService {
         int lastDot = originalFileName.lastIndexOf('.');
 
         String extension = originalFileName.substring(lastDot + 1);
-
         String storedFileName = UUID.randomUUID() + "." + extension;
-
         String uploadDirectory = basePath + claimId;
+
 
         // file type check
         if(!Objects.equals(fileType, "application/pdf")
@@ -178,18 +168,10 @@ public class DocumentServiceImpl implements DocumentService {
         }
 
         try {
-            Path uploadPath = Path.of(uploadDirectory).toAbsolutePath();
 
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
+            String s3Key = uploadDirectory + "/" + storedFileName;
 
-            Path targetLocation = uploadPath.resolve(storedFileName);
-
-            Files.copy(
-                    file.getInputStream(),
-                    targetLocation
-            );
+            s3Service.uploadFile(file, s3Key);
 
             DocumentEntity documentEntity = DocumentEntity.builder()
                     .documentId(uniqueDocumentId)
@@ -198,7 +180,7 @@ public class DocumentServiceImpl implements DocumentService {
                     .documentType(documentType)
                     .originalFileName(originalFileName)
                     .storedFileName(storedFileName)
-                    .filePath(targetLocation.toString())
+                    .filePath(s3Key)
                     .contentType(fileType)
                     .fileSize(file.getSize())
                     .uploadedAt(LocalDateTime.now())
@@ -229,5 +211,26 @@ public class DocumentServiceImpl implements DocumentService {
             throw new DocumentException("Failed to store document");
         }
 
+    }
+
+    @Override
+    public ResponseEntity<ApiResponse> deleteDoc(String documentId){
+
+        DocumentEntity document = documentRepository.findByDocumentId(documentId).orElseThrow(() -> new DocumentException("Document not found"));
+        String s3key = "";
+        String response = "";
+
+        if(document != null) {
+            s3key = document.getFilePath();
+            response = s3Service.deleteFile(s3key);
+        }
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .success(true)
+                .status(200)
+                .message(response)
+                .build();
+
+        return  ResponseEntity.ok(apiResponse);
     }
 }

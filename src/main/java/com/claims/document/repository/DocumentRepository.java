@@ -13,4 +13,6 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
     List<DocumentEntity> findByClaimIdAndUploadedBy(String claimId, String uploadedBy);
 
     Optional<DocumentEntity> findByDocumentId(String documentId);
+
+    void deleteByDocumentId(String documentId);
 }
