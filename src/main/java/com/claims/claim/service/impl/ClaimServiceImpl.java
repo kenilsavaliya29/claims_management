@@ -6,7 +6,6 @@ import com.claims.claim.entity.Claim;
 import com.claims.claim.repository.ClaimRepository;
 import com.claims.claim.service.ClaimService;
 import com.claims.common.dto.ApiResponse;
-import com.claims.common.exception.ClaimNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 

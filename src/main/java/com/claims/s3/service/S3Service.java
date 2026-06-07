@@ -6,8 +6,8 @@ import java.io.IOException;
 
 public interface S3Service {
 
-    public void uploadFile(MultipartFile file, String s3key) throws IOException;
-    public byte[] downloadFile(String s3key);
-    public String deleteFile(String s3key);
+    void uploadFile(MultipartFile file, String s3key) throws IOException;
+    byte[] downloadFile(String s3key);
+    String deleteFile(String s3key);
 
 }

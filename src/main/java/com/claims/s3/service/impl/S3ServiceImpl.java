@@ -1,6 +1,5 @@
 package com.claims.s3.service.impl;
 
-import com.claims.common.exception.S3Exception;
 import com.claims.properties.AwsProperties;
 import com.claims.s3.service.S3Service;
 import org.springframework.stereotype.Service;

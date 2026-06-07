@@ -1,6 +1,5 @@
 package com.claims.claim.dto.response;
 
-import com.claims.claim.ClaimStatus;
 import com.claims.claim.entity.Claim;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
