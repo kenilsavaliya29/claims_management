@@ -36,8 +36,8 @@ public class DocumentController {
         return documentService.uploadDoc(claimId, file, documentType);
     }
 
-    @DeleteMapping("/claims/{documentId}/documents")
-    public ResponseEntity<ApiResponse> deleteDocument(@PathVariable String documentId) {
-        return documentService.deleteDoc(documentId);
+    @DeleteMapping("/claims/{claimId}/documents/{documentId}")
+    public ResponseEntity<ApiResponse> deleteDocument(@PathVariable String claimId ,@PathVariable String documentId) {
+        return documentService.deleteDoc(claimId,documentId);
     }
 }

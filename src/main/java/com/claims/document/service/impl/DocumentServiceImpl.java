@@ -214,9 +214,9 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public ResponseEntity<ApiResponse> deleteDoc(String documentId){
+    public ResponseEntity<ApiResponse> deleteDoc(String claimId, String documentId){
 
-        DocumentEntity document = documentRepository.findByDocumentId(documentId).orElseThrow(() -> new DocumentException("Document not found"));
+        DocumentEntity document = documentRepository.findByClaimIdAndDocumentId(claimId,documentId).orElseThrow(() -> new DocumentException("Document not found"));
         String s3key = "";
         String response = "";
 
