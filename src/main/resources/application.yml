@@ -3,8 +3,8 @@ spring:
     name: Claim Management
 
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DB}?ssl-mode=REQUIRED
-#    url: jdbc:mysql://avnadmin:AVNS_1VWthu-IVpA0ePFOVgg@claim-managment-kenilsavaliya9879-34f8.h.aivencloud.com:13600/claims_db?ssl-mode=REQUIRED
+#    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DB}?ssl-mode=REQUIRED
+    url: jdbc:mysql://avnadmin:AVNS_1VWthu-IVpA0ePFOVgg@claim-managment-kenilsavaliya9879-34f8.h.aivencloud.com:13600/claims_db?ssl-mode=REQUIRED
     username: ${MYSQL_USER}
     password: ${MYSQL_PASS}
 
@@ -28,4 +28,9 @@ app:
   cors:
     allowed-origin: ${CORS_ALLOWED_ORIGINS}
 
-kind: Application
+aws:
+  access-key: ${AWS_ACCESS}
+  secret-key: ${AWS_SECRET}
+  regions: ${AWS_REGION}
+  s3:
+    bucket-name: ${AWS_BUCKET}
